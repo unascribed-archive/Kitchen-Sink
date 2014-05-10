@@ -1,0 +1,16 @@
+[
+{
+  "modid": "KitchenSink",
+  "name": "Kitchen Sink",
+  "mcversion": "1.7.2",
+  "description": "A collection of useful utilities for modders.",
+  "url": "http://augment.gameminers.com/kitchensink",
+  "authors": ["Aesen", "Falkreon"],
+  "credits": "Some utilities by Aesen, others by Falkreon",
+  "screenshots": [],
+  "logoFile": "",
+  "dependencies": [
+    "mod_MinecraftForge"
+  ]
+}
+]
