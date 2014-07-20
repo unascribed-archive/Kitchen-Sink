@@ -8,7 +8,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 
 
-@Mod(modid = "KitchenSink", name = "Kitchen Sink", version = "1.0", useMetadata = true)
+@Mod(modid = "KitchenSink", name = "Kitchen Sink", version = "0.2", useMetadata = true)
 public class KitchenSinkMod {
 	@Instance("KitchenSink") public static KitchenSinkMod	inst;
 	public static final Logger								LOG	= LogManager.getLogger("KitchenSink");

@@ -272,7 +272,7 @@ public class Rendering {
 		final Minecraft mc = Minecraft.getMinecraft();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		mc.renderEngine.bindTexture(logo);
-		final ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth,
+		final ScaledResolution scaledresolution = new ScaledResolution(mc, mc.displayWidth,
 				mc.displayHeight);
 		final int i = scaledresolution.getScaleFactor();
 		final Framebuffer framebuffer = new Framebuffer(scaledresolution.getScaledWidth() * i,
@@ -381,7 +381,7 @@ public class Rendering {
 		if (mc.currentScreen != null) {
 			return mc.currentScreen.height;
 		} else {
-			return new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight).getScaledHeight();
+			return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight).getScaledHeight();
 		}
 	}
 	
@@ -390,7 +390,7 @@ public class Rendering {
 		if (mc.currentScreen != null) {
 			return mc.currentScreen.width;
 		} else {
-			return new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight).getScaledWidth();
+			return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight).getScaledWidth();
 		}
 	}
 	
