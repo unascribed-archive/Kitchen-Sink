@@ -23,9 +23,7 @@ public class Rendering {
 			final int z) {
 		GL11.glPushMatrix();
 		final Tessellator tessellator = Tessellator.instance;
-		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glTranslatef(x, y, 0);
 		final float r = (color >> 16 & 255) / 255.0F;
 		final float g = (color >> 8 & 255) / 255.0F;
@@ -39,7 +37,6 @@ public class Rendering {
 		}
 		tessellator.draw();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glPopMatrix();
 	}
 	
@@ -160,9 +157,7 @@ public class Rendering {
 		final float f2 = (color >> 8 & 255) / 255.0F;
 		final float f3 = (color & 255) / 255.0F;
 		final Tessellator tessellator = Tessellator.instance;
-		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor4f(f1, f2, f3, f);
 		tessellator.startDrawingQuads();
 		tessellator.addVertex(x1, y2, z);
@@ -171,7 +166,6 @@ public class Rendering {
 		tessellator.addVertex(x1, y1, z);
 		tessellator.draw();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	public static void drawCenteredString(final FontRenderer fontRenderer, final String str, final int middle,
