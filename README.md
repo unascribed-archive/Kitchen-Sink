@@ -6,4 +6,4 @@ Can also be used in plain SE environments by omitting a few classes.
 
 There's no documentation as of yet; for an idea of what it can do, look through the sources.
 
-Downloads are on the [releases page](http://github.com/AesenV/Kitchen-Sink).
+Downloads are on the [releases page](http://github.com/AesenV/Kitchen-Sink/releases).
