@@ -1,3 +1,5 @@
+[![Build Status](http://ci.gameminers.com/buildStatus/icon?job=Kitchen%20Sink)](http://ci.gameminers.com/job/Kitchen%20Sink/)
+
 Kitchen Sink
 ==========
 
