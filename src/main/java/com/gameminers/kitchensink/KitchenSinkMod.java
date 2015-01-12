@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-@Mod(modid = "KitchenSink", name = "Kitchen Sink", version = "1.1.1", useMetadata = true)
+@Mod(modid = "KitchenSink", name = "Kitchen Sink", version = "1.1.2", useMetadata = true)
 public class KitchenSinkMod {
 	@Instance("KitchenSink") public static KitchenSinkMod	inst;
 	public static final Logger								LOG	= LogManager.getLogger("KitchenSink");

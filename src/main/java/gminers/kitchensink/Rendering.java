@@ -109,7 +109,7 @@ public class Rendering {
         GlStateManager.enableTexture2D();
 	}
 	
-	public void drawTexturedModalRect(float xCoord, float yCoord, int minU, int minV, int maxU, int maxV, float z) {
+	public static void drawTexturedModalRect(float xCoord, float yCoord, int minU, int minV, int maxU, int maxV, float z) {
         float f2 = 0.00390625F;
         float f3 = 0.00390625F;
         Tessellator tessellator = Tessellator.getInstance();
@@ -122,7 +122,7 @@ public class Rendering {
         tessellator.draw();
     }
 
-    public void drawTexturedModalRect(int xCoord, int yCoord, TextureAtlasSprite textureSprite, int p_175175_4_, int p_175175_5_, float z) {
+    public static void drawTexturedModalRect(int xCoord, int yCoord, TextureAtlasSprite textureSprite, int p_175175_4_, int p_175175_5_, float z) {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.startDrawingQuads();
