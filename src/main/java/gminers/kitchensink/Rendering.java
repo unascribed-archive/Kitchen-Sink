@@ -417,6 +417,10 @@ public class Rendering {
         }
     }
 	
+	public static void drawTexturedModalRect(float x, float y, int u, int v, int width, int height) {
+		drawTexturedModalRect(x, y, u, v, u+width, v+height, 0);
+	}
+	
 	private static int getHeight() {
 		final Minecraft mc = Minecraft.getMinecraft();
 		if (mc.currentScreen != null) {
