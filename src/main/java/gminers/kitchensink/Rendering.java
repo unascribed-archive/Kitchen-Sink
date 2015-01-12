@@ -1,12 +1,17 @@
 package gminers.kitchensink;
 
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.ResourceLocation;
 
@@ -22,7 +27,7 @@ public class Rendering {
 	public static void drawPolygon(final int x, final int y, final int radius, final int color, final int count,
 			final int z) {
 		GL11.glPushMatrix();
-		final Tessellator tessellator = Tessellator.instance;
+		final WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -32,147 +37,185 @@ public class Rendering {
 		final float b = (color & 255) / 255.0F;
 		final float a = (color >> 24 & 255) / 255.0F;
 		GL11.glColor4f(r, g, b, a);
-		tessellator.startDrawing(GL11.GL_POLYGON);
+		worldRenderer.startDrawing(GL11.GL_POLYGON);
 		for (int i = 0; i < count; ++i) {
-			tessellator.addVertex(Math.sin(i / ((double) count) * 2 * Math.PI) * (radius),
+			worldRenderer.addVertex(Math.sin(i / ((double) count) * 2 * Math.PI) * (radius),
 					Math.cos(i / ((double) count) * 2 * Math.PI) * (radius), z);
 		}
-		tessellator.draw();
+		Tessellator.getInstance().draw();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glPopMatrix();
 	}
 	
-	public static void drawGradientRect(final int x1, final int y1, final int x2, final int y2, final int color1,
-			final int color2) {
-		final float f = (color1 >> 24 & 255) / 255.0F;
-		final float f1 = (color1 >> 16 & 255) / 255.0F;
-		final float f2 = (color1 >> 8 & 255) / 255.0F;
-		final float f3 = (color1 & 255) / 255.0F;
-		final float f4 = (color2 >> 24 & 255) / 255.0F;
-		final float f5 = (color2 >> 16 & 255) / 255.0F;
-		final float f6 = (color2 >> 8 & 255) / 255.0F;
-		final float f7 = (color2 & 255) / 255.0F;
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glShadeModel(GL11.GL_SMOOTH);
-		final Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA_F(f1, f2, f3, f);
-		tessellator.addVertex(x2, y1, 0D);
-		tessellator.addVertex(x1, y1, 0D);
-		tessellator.setColorRGBA_F(f5, f6, f7, f4);
-		tessellator.addVertex(x1, y2, 0D);
-		tessellator.addVertex(x2, y2, 0D);
-		tessellator.draw();
-		GL11.glShadeModel(GL11.GL_FLAT);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+	public static void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor, float z) {
+		float f = (float)(startColor >> 24 & 255) / 255.0F;
+        float f1 = (float)(startColor >> 16 & 255) / 255.0F;
+        float f2 = (float)(startColor >> 8 & 255) / 255.0F;
+        float f3 = (float)(startColor & 255) / 255.0F;
+        float f4 = (float)(endColor >> 24 & 255) / 255.0F;
+        float f5 = (float)(endColor >> 16 & 255) / 255.0F;
+        float f6 = (float)(endColor >> 8 & 255) / 255.0F;
+        float f7 = (float)(endColor & 255) / 255.0F;
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.shadeModel(7425);
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.setColorRGBA_F(f1, f2, f3, f);
+        worldrenderer.addVertex((double)right, (double)top, (double)z);
+        worldrenderer.addVertex((double)left, (double)top, (double)z);
+        worldrenderer.setColorRGBA_F(f5, f6, f7, f4);
+        worldrenderer.addVertex((double)left, (double)bottom, (double)z);
+        worldrenderer.addVertex((double)right, (double)bottom, (double)z);
+        tessellator.draw();
+        GlStateManager.shadeModel(7424);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
 	}
 	
-	public static void drawHorzGradientRect(final int x1, final int y1, final int x2, final int y2, final int color1,
-			final int color2) {
-		final float f = (color1 >> 24 & 255) / 255.0F;
-		final float f1 = (color1 >> 16 & 255) / 255.0F;
-		final float f2 = (color1 >> 8 & 255) / 255.0F;
-		final float f3 = (color1 & 255) / 255.0F;
-		final float f4 = (color2 >> 24 & 255) / 255.0F;
-		final float f5 = (color2 >> 16 & 255) / 255.0F;
-		final float f6 = (color2 >> 8 & 255) / 255.0F;
-		final float f7 = (color2 & 255) / 255.0F;
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glShadeModel(GL11.GL_SMOOTH);
-		final Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA_F(f1, f2, f3, f);
-		tessellator.addVertex(x1, y2, 0D);
-		tessellator.setColorRGBA_F(f5, f6, f7, f4);
-		tessellator.addVertex(x2, y2, 0D);
-		tessellator.addVertex(x2, y1, 0D);
-		tessellator.setColorRGBA_F(f1, f2, f3, f);
-		tessellator.addVertex(x1, y1, 0D);
-		tessellator.draw();
-		GL11.glShadeModel(GL11.GL_FLAT);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+	public static void drawHorzGradientRect(int left, int top, int right, int bottom, int startColor, int endColor, float z) {
+		float f = (float)(startColor >> 24 & 255) / 255.0F;
+        float f1 = (float)(startColor >> 16 & 255) / 255.0F;
+        float f2 = (float)(startColor >> 8 & 255) / 255.0F;
+        float f3 = (float)(startColor & 255) / 255.0F;
+        float f4 = (float)(endColor >> 24 & 255) / 255.0F;
+        float f5 = (float)(endColor >> 16 & 255) / 255.0F;
+        float f6 = (float)(endColor >> 8 & 255) / 255.0F;
+        float f7 = (float)(endColor & 255) / 255.0F;
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.shadeModel(7425);
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.setColorRGBA_F(f5, f6, f7, f4);
+        worldrenderer.addVertex((double)right, (double)top, (double)z);
+        worldrenderer.setColorRGBA_F(f1, f2, f3, f);
+        worldrenderer.addVertex((double)left, (double)top, (double)z);
+        worldrenderer.addVertex((double)left, (double)bottom, (double)z);
+        worldrenderer.setColorRGBA_F(f5, f6, f7, f4);
+        worldrenderer.addVertex((double)right, (double)bottom, (double)z);
+        tessellator.draw();
+        GlStateManager.shadeModel(7424);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
 	}
 	
-	public static void drawTexturedModalRect(final int x, final int y, final int u, final int v, final int width,
-			final int height) {
-		drawTexturedModalRect(x, y, u, v, width, height, 0);
-	}
+	public void drawTexturedModalRect(float xCoord, float yCoord, int minU, int minV, int maxU, int maxV, float z) {
+        float f2 = 0.00390625F;
+        float f3 = 0.00390625F;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.addVertexWithUV((double)(xCoord + 0.0F), (double)(yCoord + (float)maxV), (double)z, (double)((float)(minU + 0) * f2), (double)((float)(minV + maxV) * f3));
+        worldrenderer.addVertexWithUV((double)(xCoord + (float)maxU), (double)(yCoord + (float)maxV), (double)z, (double)((float)(minU + maxU) * f2), (double)((float)(minV + maxV) * f3));
+        worldrenderer.addVertexWithUV((double)(xCoord + (float)maxU), (double)(yCoord + 0.0F), (double)z, (double)((float)(minU + maxU) * f2), (double)((float)(minV + 0) * f3));
+        worldrenderer.addVertexWithUV((double)(xCoord + 0.0F), (double)(yCoord + 0.0F), (double)z, (double)((float)(minU + 0) * f2), (double)((float)(minV + 0) * f3));
+        tessellator.draw();
+    }
+
+    public void drawTexturedModalRect(int xCoord, int yCoord, TextureAtlasSprite textureSprite, int p_175175_4_, int p_175175_5_, float z) {
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.addVertexWithUV((double)(xCoord + 0), (double)(yCoord + p_175175_5_), (double)z, (double)textureSprite.getMinU(), (double)textureSprite.getMaxV());
+        worldrenderer.addVertexWithUV((double)(xCoord + p_175175_4_), (double)(yCoord + p_175175_5_), (double)z, (double)textureSprite.getMaxU(), (double)textureSprite.getMaxV());
+        worldrenderer.addVertexWithUV((double)(xCoord + p_175175_4_), (double)(yCoord + 0), (double)z, (double)textureSprite.getMaxU(), (double)textureSprite.getMinV());
+        worldrenderer.addVertexWithUV((double)(xCoord + 0), (double)(yCoord + 0), (double)z, (double)textureSprite.getMinU(), (double)textureSprite.getMinV());
+        tessellator.draw();
+    }
+
+    public static void drawModalRectWithCustomSizedTexture(int x, int y, float u, float v, int width, int height, float textureWidth, float textureHeight) {
+        float f4 = 1.0F / textureWidth;
+        float f5 = 1.0F / textureHeight;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.addVertexWithUV((double)x, (double)(y + height), 0.0D, (double)(u * f4), (double)((v + (float)height) * f5));
+        worldrenderer.addVertexWithUV((double)(x + width), (double)(y + height), 0.0D, (double)((u + (float)width) * f4), (double)((v + (float)height) * f5));
+        worldrenderer.addVertexWithUV((double)(x + width), (double)y, 0.0D, (double)((u + (float)width) * f4), (double)(v * f5));
+        worldrenderer.addVertexWithUV((double)x, (double)y, 0.0D, (double)(u * f4), (double)(v * f5));
+        tessellator.draw();
+    }
+
+    public static void drawScaledCustomSizeModalRect(int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
+        float f4 = 1.0F / tileWidth;
+        float f5 = 1.0F / tileHeight;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.addVertexWithUV((double)x, (double)(y + height), 0.0D, (double)(u * f4), (double)((v + (float)vHeight) * f5));
+        worldrenderer.addVertexWithUV((double)(x + width), (double)(y + height), 0.0D, (double)((u + (float)uWidth) * f4), (double)((v + (float)vHeight) * f5));
+        worldrenderer.addVertexWithUV((double)(x + width), (double)y, 0.0D, (double)((u + (float)uWidth) * f4), (double)(v * f5));
+        worldrenderer.addVertexWithUV((double)x, (double)y, 0.0D, (double)(u * f4), (double)(v * f5));
+        tessellator.draw();
+    }
 	
-	public static void drawTexturedModalRect(final int x, final int y, final int u, final int v, final int width,
-			final int height, final double z) {
-		final float f = 0.00390625F;
-		final float f1 = 0.00390625F;
-		final Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		tessellator.addVertexWithUV(x + 0, y + height, z, (u + 0) * f, (v + height) * f1);
-		tessellator.addVertexWithUV(x + width, y + height, z, (u + width) * f, (v + height) * f1);
-		tessellator.addVertexWithUV(x + width, y + 0, z, (u + width) * f, (v + 0) * f1);
-		tessellator.addVertexWithUV(x + 0, y + 0, z, (u + 0) * f, (v + 0) * f1);
-		tessellator.draw();
-	}
-	
-	private static void drawHorizontalLine(int x1, int x2, final int y1, final int y2) {
-		if (x2 < x1) {
-			final int i1 = x1;
-			x1 = x2;
-			x2 = i1;
-		}
-		
-		drawRect(x1, y1, x2 + 1, y1 + 1, y2);
-	}
-	
-	public static void drawRect(final int x1, final int y1, final int x2, final int y2, final int color) {
-		drawRect(x1, y1, x2, y2, color, 0.0);
-	}
-	
-	public static void drawRect(final int x1, final int y1, final int x2, final int y2, final int color, final double z) {
-		drawRect((float) x1, (float) y1, (float) x2, (float) y2, color, z);
-	}
-	
-	public static void drawRect(float x1, float y1, float x2, float y2, final int color, final double z) {
-		float j1;
-		
-		if (x1 < x2) {
-			j1 = x1;
-			x1 = x2;
-			x2 = j1;
-		}
-		
-		if (y1 < y2) {
-			j1 = y1;
-			y1 = y2;
-			y2 = j1;
-		}
-		
-		final float f = (color >> 24 & 255) / 255.0F;
-		final float f1 = (color >> 16 & 255) / 255.0F;
-		final float f2 = (color >> 8 & 255) / 255.0F;
-		final float f3 = (color & 255) / 255.0F;
-		final Tessellator tessellator = Tessellator.instance;
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glColor4f(f1, f2, f3, f);
-		tessellator.startDrawingQuads();
-		tessellator.addVertex(x1, y2, z);
-		tessellator.addVertex(x2, y2, z);
-		tessellator.addVertex(x2, y1, z);
-		tessellator.addVertex(x1, y1, z);
-		tessellator.draw();
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-	}
+    public static void drawHorizontalLine(int startX, int endX, int y, int color) {
+        if (endX < startX) {
+            int i1 = startX;
+            startX = endX;
+            endX = i1;
+        }
+
+        drawRect(startX, y, endX + 1, y + 1, color);
+    }
+
+    public static void drawVerticalLine(int x, int startY, int endY, int color) {
+        if (endY < startY) {
+            int i1 = startY;
+            startY = endY;
+            endY = i1;
+        }
+
+        drawRect(x, startY + 1, x + 1, endY, color);
+    }
+
+    public static void drawRect(int left, int top, int right, int bottom, int color)
+    {
+        int j1;
+
+        if (left < right)
+        {
+            j1 = left;
+            left = right;
+            right = j1;
+        }
+
+        if (top < bottom)
+        {
+            j1 = top;
+            top = bottom;
+            bottom = j1;
+        }
+
+        float f3 = (float)(color >> 24 & 255) / 255.0F;
+        float f = (float)(color >> 16 & 255) / 255.0F;
+        float f1 = (float)(color >> 8 & 255) / 255.0F;
+        float f2 = (float)(color & 255) / 255.0F;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(f, f1, f2, f3);
+        worldrenderer.startDrawingQuads();
+        worldrenderer.addVertex((double)left, (double)bottom, 0.0D);
+        worldrenderer.addVertex((double)right, (double)bottom, 0.0D);
+        worldrenderer.addVertex((double)right, (double)top, 0.0D);
+        worldrenderer.addVertex((double)left, (double)top, 0.0D);
+        tessellator.draw();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
 	
 	public static void drawCenteredString(final FontRenderer fontRenderer, final String str, final int middle,
 			final int y, final int color) {
@@ -181,22 +224,22 @@ public class Rendering {
 	
 	public static void drawSectionHeader(final String str, final int middle, final int y, final int color) {
 		final int shadowColor = (color & 16579836) >> 2 | color & -16777216;
-		final int imgWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(str);
+		final int imgWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str);
 		drawHorizontalLine(middle - 200, middle - (imgWidth / 2) - 5, y + 3, color);
 		drawHorizontalLine(middle + 200, middle + (imgWidth / 2) + 5, y + 3, color);
 		drawHorizontalLine(middle - 200, middle - (imgWidth / 2) - 4, y + 4, shadowColor);
 		drawHorizontalLine(middle + 201, middle + (imgWidth / 2) + 6, y + 4, shadowColor);
-		drawCenteredString(Minecraft.getMinecraft().fontRenderer, str, middle, y, color);
+		drawCenteredString(Minecraft.getMinecraft().fontRendererObj, str, middle, y, color);
 	}
 	
 	public static void drawShortSectionHeader(final String str, final int middle, final int y, final int color) {
 		final int shadowColor = (color & 16579836) >> 2 | color & -16777216;
-		final int imgWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(str);
+		final int imgWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str);
 		drawHorizontalLine(middle - 115, middle - (imgWidth / 2) - 5, y + 3, color);
 		drawHorizontalLine(middle + 115, middle + (imgWidth / 2) + 5, y + 3, color);
 		drawHorizontalLine(middle - 115, middle - (imgWidth / 2) - 4, y + 4, shadowColor);
 		drawHorizontalLine(middle + 116, middle + (imgWidth / 2) + 6, y + 4, shadowColor);
-		drawCenteredString(Minecraft.getMinecraft().fontRenderer, str, middle, y, color);
+		drawCenteredString(Minecraft.getMinecraft().fontRendererObj, str, middle, y, color);
 	}
 	
 	public static void drawOutlinedString(final FontRenderer fontRenderer, final String str, final int x, final int y,
@@ -269,112 +312,111 @@ public class Rendering {
 	public static final ResourceLocation	MOJANG_LOGO	= new ResourceLocation("textures/gui/title/mojang.png");
 	
 	public static void drawFullScreenLogo(final ResourceLocation logo, final int bg) {
-		final Minecraft mc = Minecraft.getMinecraft();
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		mc.renderEngine.bindTexture(logo);
-		final ScaledResolution scaledresolution = new ScaledResolution(mc, mc.displayWidth,
-				mc.displayHeight);
-		final int i = scaledresolution.getScaleFactor();
-		final Framebuffer framebuffer = new Framebuffer(scaledresolution.getScaledWidth() * i,
-				scaledresolution.getScaledHeight() * i, true);
-		framebuffer.bindFramebuffer(false);
-		GL11.glMatrixMode(GL11.GL_PROJECTION);
-		GL11.glLoadIdentity();
-		GL11.glOrtho(0.0D, scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight(), 0.0D, 1000.0D,
-				3000.0D);
-		GL11.glMatrixMode(GL11.GL_MODELVIEW);
-		GL11.glLoadIdentity();
-		GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDisable(GL11.GL_FOG);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		mc.renderEngine.bindTexture(logo);
-		final Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		tessellator.setColorOpaque_I(bg);
-		tessellator.addVertexWithUV(0.0D, mc.displayHeight, 0.0D, 0.0D, 0.0D);
-		tessellator.addVertexWithUV(mc.displayWidth, mc.displayHeight, 0.0D, 0.0D, 0.0D);
-		tessellator.addVertexWithUV(mc.displayWidth, 0.0D, 0.0D, 0.0D, 0.0D);
-		tessellator.addVertexWithUV(0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
-		tessellator.draw();
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		tessellator.setColorOpaque_I(bg);
-		final short short1 = 256;
-		final short short2 = 256;
-		mc.scaledTessellator((scaledresolution.getScaledWidth() - short1) / 2,
-				(scaledresolution.getScaledHeight() - short2) / 2, 0, 0, short1, short2);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDisable(GL11.GL_FOG);
-		framebuffer.unbindFramebuffer();
-		framebuffer.framebufferRender(scaledresolution.getScaledWidth() * i, scaledresolution.getScaledHeight() * i);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
-		GL11.glFlush();
-		mc.func_147120_f();
+		Minecraft mc = Minecraft.getMinecraft();
+		ScaledResolution scaledresolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+        int i = scaledresolution.getScaleFactor();
+        Framebuffer framebuffer = new Framebuffer(scaledresolution.getScaledWidth() * i, scaledresolution.getScaledHeight() * i, true);
+        framebuffer.bindFramebuffer(false);
+        GlStateManager.matrixMode(5889);
+        GlStateManager.loadIdentity();
+        GlStateManager.ortho(0.0D, (double)scaledresolution.getScaledWidth(), (double)scaledresolution.getScaledHeight(), 0.0D, 1000.0D, 3000.0D);
+        GlStateManager.matrixMode(5888);
+        GlStateManager.loadIdentity();
+        GlStateManager.translate(0.0F, 0.0F, -2000.0F);
+        GlStateManager.disableLighting();
+        GlStateManager.disableFog();
+        GlStateManager.disableDepth();
+        GlStateManager.enableTexture2D();
+        mc.getTextureManager().bindTexture(logo);
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.setColorOpaque_I(16777215);
+        worldrenderer.addVertexWithUV(0.0D, (double)mc.displayHeight, 0.0D, 0.0D, 0.0D);
+        worldrenderer.addVertexWithUV((double)mc.displayWidth, (double)mc.displayHeight, 0.0D, 0.0D, 0.0D);
+        worldrenderer.addVertexWithUV((double)mc.displayWidth, 0.0D, 0.0D, 0.0D, 0.0D);
+        worldrenderer.addVertexWithUV(0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        tessellator.draw();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        worldrenderer.setColorOpaque_I(bg);
+        short short1 = 256;
+        short short2 = 256;
+        mc.scaledTessellator((scaledresolution.getScaledWidth() - short1) / 2, (scaledresolution.getScaledHeight() - short2) / 2, 0, 0, short1, short2);
+        GlStateManager.disableLighting();
+        GlStateManager.disableFog();
+        framebuffer.unbindFramebuffer();
+        framebuffer.framebufferRender(scaledresolution.getScaledWidth() * i, scaledresolution.getScaledHeight() * i);
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(516, 0.1F);
+        mc.updateDisplay();
 	}
 	
-	public static void drawHoveringText(final List<String> text, final int x, final int y, final int width,
-			final int height,
-			final FontRenderer font) {
-		if (!text.isEmpty()) {
-			int longestLine = 0;
-			for (final String s : text) {
-				final int stringWidth = font.getStringWidth(s);
-				
-				if (stringWidth > longestLine) {
-					longestLine = stringWidth;
-				}
-			}
-			
-			int textX = x + 12;
-			int textY = y - 12;
-			int boxHeight = font.FONT_HEIGHT;
-			
-			if (text.size() > 1) {
-				boxHeight += 2 + (text.size() - 1) * 10;
-			}
-			
-			if (textX + longestLine > width) {
-				if (textX - (28 + longestLine) >= 0) {
-					textX -= 28 + longestLine;
-				}
-			}
-			
-			if (textY + boxHeight + 6 > height) {
-				textY = getHeight() - boxHeight - 6;
-			}
-			
-			final int color = 0xF0100010;
-			GL11.glTranslatef(0.0f, 0.0f, 35.0f);
-			drawGradientRect(textX - 3, textY - 4, textX + longestLine + 3, textY - 3, color, color);
-			drawGradientRect(textX - 3, textY + boxHeight + 3, textX + longestLine + 3, textY + boxHeight + 4, color,
-					color);
-			drawGradientRect(textX - 3, textY - 3, textX + longestLine + 3, textY + boxHeight + 3, color, color);
-			drawGradientRect(textX - 4, textY - 3, textX - 3, textY + boxHeight + 3, color, color);
-			drawGradientRect(textX + longestLine + 3, textY - 3, textX + longestLine + 4, textY + boxHeight + 3, color,
-					color);
-			final int color1 = 0x505000FF;
-			final int color2 = (color1 & 0x9F5F5F1) >> 1 | color1 & 0xFF000000;
-			drawGradientRect(textX - 3, textY - 3 + 1, textX - 3 + 1, textY + boxHeight + 3 - 1, color1, color2);
-			drawGradientRect(textX + longestLine + 2, textY - 3 + 1, textX + longestLine + 3, textY + boxHeight + 3
-					- 1, color1, color2);
-			drawGradientRect(textX - 3, textY - 3, textX + longestLine + 3, textY - 3 + 1, color1, color1);
-			drawGradientRect(textX - 3, textY + boxHeight + 2, textX + longestLine + 3, textY + boxHeight + 3, color2,
-					color2);
-			
-			for (int i = 0; i < text.size(); ++i) {
-				final String s = text.get(i);
-				font.drawStringWithShadow(s, textX, textY, 0xFFFFFF);
-				
-				if (i == 0) {
-					textY += 2;
-				}
-				
-				textY += 10;
-			}
-		}
-	}
+	protected void drawHoveringText(List textLines, int x, int y, FontRenderer font) {
+        if (!textLines.isEmpty()) {
+        	Minecraft mc = Minecraft.getMinecraft();
+            GlStateManager.disableRescaleNormal();
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            int k = 0;
+            Iterator iterator = textLines.iterator();
+
+            while (iterator.hasNext()) {
+                String s = (String)iterator.next();
+                int l = font.getStringWidth(s);
+
+                if (l > k) {
+                    k = l;
+                }
+            }
+
+            int j2 = x + 12;
+            int k2 = y - 12;
+            int i1 = 8;
+
+            if (textLines.size() > 1) {
+                i1 += 2 + (textLines.size() - 1) * 10;
+            }
+
+            if (j2 + k > getWidth()) {
+                j2 -= 28 + k;
+            }
+
+            if (k2 + i1 + 6 > getHeight()) {
+                k2 = getHeight() - i1 - 6;
+            }
+
+            float z = 300.0F;
+            int j1 = -267386864;
+            drawGradientRect(j2 - 3, k2 - 4, j2 + k + 3, k2 - 3, j1, j1, z);
+            drawGradientRect(j2 - 3, k2 + i1 + 3, j2 + k + 3, k2 + i1 + 4, j1, j1, z);
+            drawGradientRect(j2 - 3, k2 - 3, j2 + k + 3, k2 + i1 + 3, j1, j1, z);
+            drawGradientRect(j2 - 4, k2 - 3, j2 - 3, k2 + i1 + 3, j1, j1, z);
+            drawGradientRect(j2 + k + 3, k2 - 3, j2 + k + 4, k2 + i1 + 3, j1, j1, z);
+            int k1 = 1347420415;
+            int l1 = (k1 & 16711422) >> 1 | k1 & -16777216;
+            drawGradientRect(j2 - 3, k2 - 3 + 1, j2 - 3 + 1, k2 + i1 + 3 - 1, k1, l1, z);
+            drawGradientRect(j2 + k + 2, k2 - 3 + 1, j2 + k + 3, k2 + i1 + 3 - 1, k1, l1, z);
+            drawGradientRect(j2 - 3, k2 - 3, j2 + k + 3, k2 - 3 + 1, k1, k1, z);
+            drawGradientRect(j2 - 3, k2 + i1 + 2, j2 + k + 3, k2 + i1 + 3, l1, l1, z);
+
+            for (int i2 = 0; i2 < textLines.size(); ++i2) {
+                String s1 = (String)textLines.get(i2);
+                font.drawStringWithShadow(s1, j2, k2, -1);
+
+                if (i2 == 0) {
+                    k2 += 2;
+                }
+
+                k2 += 10;
+            }
+
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
+            RenderHelper.enableStandardItemLighting();
+            GlStateManager.enableRescaleNormal();
+        }
+    }
 	
 	private static int getHeight() {
 		final Minecraft mc = Minecraft.getMinecraft();
