@@ -351,9 +351,8 @@ public class Rendering {
         mc.updateDisplay();
 	}
 	
-	protected void drawHoveringText(List textLines, int x, int y, FontRenderer font) {
+	public static void drawHoveringText(List textLines, int x, int y, FontRenderer font) {
         if (!textLines.isEmpty()) {
-        	Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.disableRescaleNormal();
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableLighting();
